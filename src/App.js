@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import axios from 'axios';
-
-const info = {
-  key: 'c6cf35300cb54c4ef7da1c2fa07c88bc',
-  baseUrl: 'https://api.openweathermap.org/data/2.5/weather'
-}
+import { getCurrentWeather } from './api/weatherRequests';
 
 function App() {
   const [zip, setZip] = useState('');
+  const [isValidZip, setIsValidZip] = useState(false);
   const [temp, setTemp] = useState('');
   const [realFeel, setRealFeel] = useState('');
   const [windSpeed, setWindSpeed] = useState('');
@@ -19,40 +15,45 @@ function App() {
 
   const search = (event) => {
     if(event.key === 'Enter') {
-      axios.get(
-        info.baseUrl,
-        {
-          params: {
-            zip: zip,
-            appid: info.key
-          }
+      getCurrentWeather(zip).then(res => {
+        console.log(res);
+        if(res.error) {
+          setIsValidZip(false);
         }
-      ).then(res => {
-        // temp is given in Kelvin, so convert to Fahrenheit
-        let tempKelvin = parseFloat(res.data.main.temp);
-        let tempFahrenheit = convertToFahrenheit(tempKelvin);
-
-        let realFeelKelvin = parseFloat(res.data.main.feels_like);
-        let realFeelFahrenheit = convertToFahrenheit(realFeelKelvin);
-
-        // wind speed is given in meters per second, so convert to mph
-        let windSpeedMph = Math.round(parseFloat(res.data.wind.speed) * 2.237);
-
-        setTemp(tempFahrenheit + ' ॰F');
-        setRealFeel(realFeelFahrenheit + ' ॰F');
-        setWindSpeed(windSpeedMph + ' mph');
-        setCloudCover(res.data.clouds.all + '%');
-        setHumidity(res.data.main.humidity + '%');
-        setCity('Showing weather for ' + res.data.name);
-      }).catch(err => {
-        setTemp('Could not find temperature for this location');
+        else {
+          setIsValidZip(true);
+          setTemp(res.tempFahrenheit);
+          setRealFeel(res.realFeelFahrenheit);
+          setWindSpeed(res.windSpeedMph);
+          setCloudCover(res.cloudCover);
+          setHumidity(res.humidity);
+          setCity(res.city);
+        }
       });
     }
   }
 
-  const convertToFahrenheit = (tempKelvin) => {
-    
-    return Math.round((tempKelvin - 273.15) * (9 / 5) + 32);
+  const getDisplayInfo = () => {
+    if(isValidZip) {
+      return (
+        <div>
+          <h2><b><u>{city}</u></b></h2>
+          <h3 className="mt-4"><b>Actual Temperature</b></h3>
+          <h4>{temp + ' ॰F'}</h4>
+          <h3 className="mt-4"><b>Feels Like</b></h3>
+          <h4>{realFeel + ' ॰F'}</h4>
+          <h3 className="mt-4"><b>Wind Speed</b></h3>
+          <h4>{windSpeed + ' mph'}</h4>
+          <h3 className="mt-4"><b>Cloud Cover</b></h3>
+          <h4>{cloudCover + '%'}</h4>
+          <h3 className="mt-4"><b>Humidity</b></h3>
+          <h4>{humidity + '%'}</h4>
+        </div>
+      );
+    }
+    else {
+      return <h3><b>Enter a valid zip code</b></h3>;
+    }
   }
 
   return (
@@ -68,17 +69,7 @@ function App() {
       />
       <p>Press enter to search</p>
       <hr />
-      <h2><b><u>{city}</u></b></h2>
-      <h3 className="mt-4"><b>Actual Temperature</b></h3>
-      <h4>{temp}</h4>
-      <h3 className="mt-4"><b>Feels Like</b></h3>
-      <h4>{realFeel}</h4>
-      <h3 className="mt-4"><b>Wind Speed</b></h3>
-      <h4>{windSpeed}</h4>
-      <h3 className="mt-4"><b>Cloud Cover</b></h3>
-      <h4>{cloudCover}</h4>
-      <h3 className="mt-4"><b>Humidity</b></h3>
-      <h4>{humidity}</h4>
+      {getDisplayInfo()}
     </div>
   );
 }
