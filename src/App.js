@@ -16,7 +16,6 @@ function App() {
   const search = (event) => {
     if(event.key === 'Enter') {
       getCurrentWeather(zip).then(res => {
-        console.log(res);
         if(res.error) {
           setIsValidZip(false);
         }
@@ -57,8 +56,8 @@ function App() {
   }
 
   return (
-    <div className="app mt-5 text-center">
-      <h1><b>⛅ Weather ⚡</b></h1>
+    <div className="app pt-5 text-center">
+      <h1 className="mb-0"><b>⛅ Weather ⚡</b></h1>
       <br />
       <input 
         type="number"
@@ -66,8 +65,9 @@ function App() {
         onChange={event => setZip(event.target.value)} 
         value={zip}
         onKeyPress={search}
+        className="form-control ml-auto mr-auto"
       />
-      <p>Press enter to search</p>
+      <p className="pt-2">Press enter to search</p>
       <hr />
       {getDisplayInfo()}
     </div>

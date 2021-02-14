@@ -1,8 +1,22 @@
-/* .app {
-    background-color: #363c4b;
+/* * {
+    color: white;
+    background-image: linear-gradient(red, yellow);
+} */
+
+.form-control {
+    width: 150px !important;
+}
+
+.app {
+    /* background-color: #8b006d; */
+    background-image: linear-gradient(rgb(5, 0, 71), rgb(223, 89, 0));
     color: white;
 }
 
 html {
-    background-color: #363c4b;
-} */
+    background-color: rgb(223, 89, 0);
+}
+
+/*
+ * gray: #363c4b, purple: #26003b
+ */
